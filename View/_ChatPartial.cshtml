@@ -1,0 +1,36 @@
+﻿@{
+ HttpCookie loginCookie = Request.Cookies["Khupho_login_Cookies"];
+ if (loginCookie != null)
+ {
+     ViewBag.Currentuser = loginCookie["UserName"].ToString();
+     ViewBag.UserId = loginCookie["UserId"].ToString();
+ }                                                     
+}
+
+<link href="@Url.Content("~/Content/OurChat/Chatstyle.css")" rel="stylesheet" />
+    @Html.Hidden("lusername", (string)ViewBag.Currentuser)
+    @Html.Hidden("luserid", (string)ViewBag.UserId)
+
+
+
+<div class="chat_box">
+
+    @Html.Hidden("luserconid","")
+	<div class="chat_head"><i class="fa fa-comments" aria-hidden="true"></i>&nbsp;Private Chat</div>
+	<div class="chat_body" id="divusers"  style="display: none;">
+	@*    <div class="user" onclick="javascript:register_popup('123456', 'Krishna Teja');"> Krishna Teja</div>
+          <div class="user" onclick="javascript:register_popup('123457', 'John Doe');"> John Doe</div>
+          <div class="user" onclick="javascript:register_popup('123458', 'John Doe');"> John Doe</div>
+          <div class="user" onclick="javascript:register_popup('123459', 'John Doe1');"> John Doe1</div>
+          <div class="user" onclick="javascript:register_popup('1234510', 'John Doe2');"> John Doe2</div>
+          <div class="user" onclick="javascript:register_popup('1234511', 'John Doe3');"> John Doe3</div>
+          <div class="user" onclick="javascript:register_popup('1234512', 'John Doe4');"> John Doe4</div>
+          <div class="user" onclick="javascript:register_popup('1234513', 'John Doe5');"> John Doe5</div>
+          <div class="user" onclick="javascript:register_popup('1234514', 'John Doe6');"> John Doe6</div>*@
+	</div>
+  </div>
+
+ <div id="messageBoxCntainer">
+
+</div>
+

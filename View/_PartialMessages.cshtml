@@ -1,0 +1,41 @@
+﻿@using System.Data
+@{
+    HttpCookie loginCookieMontages = Request.Cookies["Khupho_login_Cookies"];
+    Classes.ChatDataLayer dl = new Classes.ChatDataLayer();
+    System.Data.DataTable dt = new System.Data.DataTable();
+    System.Data.DataTable dtgetphoto = new System.Data.DataTable();
+    string sender = "",receiver="";
+    
+    if(loginCookieMontages!=null)
+    {
+       sender= loginCookieMontages["UserId"].ToString();
+    }
+        
+    if (!string.IsNullOrEmpty(ViewBag.toid))
+    {
+        receiver =(string)ViewBag.toid;
+    }
+    if (receiver!="")
+    {
+        dl.Inline_Process("update dbo.Message set Is_Read=1 where Msg_From_User_Id='" + receiver + "' and Msg_To_User_Id='" + sender + "'");
+        dt = dl.getMessage(receiver, sender).Tables[0];
+    }    
+    if (dt.Rows.Count>0)
+    {
+        foreach(DataRow dr in dt.Rows)
+        {
+            if (dr["Msg_From_User_Id"].ToString() == sender)
+            {
+                 @Html.Raw("<div id='MSG"+dr["Msg_id"].ToString()+"' class='msg_row_a msg_row'><div class='msg_a'><i data-item='"+dr["Msg_id"].ToString()+"' class='fa fa-trash-o removemessage'></i>&nbsp;"+dr["Message"].ToString()+"<p class='chat-p'><i class='fa fa-calendar'></i>&nbsp;" + (dr["Msg_Date"].ToString()!=""?Convert.ToDateTime(dr["Msg_Date"].ToString()).ToString("dd MMM,yyyy hh:mm tt"):"")  +"</p></div></div>")
+            }
+            else
+            {
+                @Html.Raw("<div id='MSG"+dr["Msg_id"].ToString()+"' class='msg_row_b msg_row'><div class='msg_b'><i data-item='"+dr["Msg_id"].ToString()+"' class='fa fa-trash-o removemessage'></i>&nbsp;"+dr["Message"].ToString()+"<p class='chat-p'><i class='fa fa-calendar'></i>&nbsp;" + (dr["Msg_Date"].ToString()!=""?Convert.ToDateTime(dr["Msg_Date"].ToString()).ToString("dd MMM,yyyy hh:mm tt"):"")   +"</p></div></div>")
+            }
+        }
+       
+    }
+    
+
+}
+

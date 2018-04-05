@@ -1,0 +1,154 @@
+﻿@{
+    Layout = null;
+    HttpCookie loginCookie = Request.Cookies["Khupho_login_Cookies"];
+    if (loginCookie != null)
+    {
+        ViewBag.Currentuser = loginCookie["UserName"].ToString();
+        ViewBag.cUserId = loginCookie["UserId"].ToString();
+    }
+    string userid = "",ctrid = "",name = "";
+    userid = ViewBag.UserId;
+    ctrid = ViewBag.CtrId;
+    name = ViewBag.Name;
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Chat Box</title>
+    <link href="@Url.Content("~/Content/themes/Sites/css/bootstrap.min.css")" rel="stylesheet" media="screen">
+    <link href="@Url.Content("~/Content/themes/Sites/assets/font-awesome-4.7.0/css/font-awesome.min.css")" rel="stylesheet" media="screen">
+    <link href="@Url.Content("~/Content/themes/Sites/assets/jquery-ui-1.12.1/jquery-ui.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/themes/Sites/css/responsive.css")" rel="stylesheet" type="text/css" media="all" />
+    <link href="@Url.Content("~/Content/themes/Sites/fullcalendarnew/fullcalendar.min.css")" rel="stylesheet" />
+
+    <link href="@Url.Content("~/Content/OurChat/Chatstyle.css")" rel="stylesheet" />
+
+
+    <script src="@Url.Content("~/Content/themes/Sites/js/jquery-3.1.1.min.js")"></script>
+
+    <link href="@Url.Content("~/Content/OurChat/Emoji/emojionearea.css")" rel="stylesheet" />
+    <script src="@Url.Content("~/Content/OurChat/Emoji/emojionearea.js")"></script>
+    <script src="@Url.Content("~/Scripts/chat/jquery.signalR-2.2.1.js")"></script>
+    <script src="@Url.Content("~/signalr/hubs")"></script>
+    <style>
+        .msg_box {
+            width:100%;
+        }
+        .chat_head, .msg_head {
+        border-radius: 0px 0px 0px 0px !important; 
+        }
+        
+        body { overflow:hidden;}
+        .msg_box { top:0px;}
+        .msg_wrap { width: 100%; height: 100%; float: left;}
+        .msg_body { height: 70%;}
+        .msg_footer { height: 30%;}
+        .msg_input { height:100%; float:left;}
+    </style>
+</head>
+<body>
+@Html.Hidden("lusername", (string)ViewBag.Currentuser)
+@Html.Hidden("luserid", (string)ViewBag.cUserId)
+@Html.Hidden("luserconid","")
+<div id="messageBoxCntainer" >
+    @*@if (loginCookie != null)
+    {
+        @Html.Partial("_ChatPartial")
+    }*@
+</div>
+<script src="@Url.Content("~/Content/OurChat/Chatscript.js")"></script>
+<script type="text/javascript">
+        function getlist(userid) {
+            var pid = userid;
+            var ctrId = 'private_' + userid;
+            $.ajax({
+                url: '@Url.Action("GetMessages", "Chat")',
+                type: 'POST',
+                data: { id: pid },
+                success: function (data) {
+                    $(data).insertBefore($('#' + ctrId).find('.msg_wrap .msg_push'));
+                    $('#' + ctrId).find('.msg_body').scrollTop($('#' + ctrId).find('.msg_body')[0].scrollHeight);
+                },
+                error: function (req, status, error) {
+                },
+            });
+        }
+    </script>
+<script>
+        //function InitiateEmoji() {
+        //    $('.msg_box').each(function () {
+        //        var ctrId = $(this).attr('id');
+        //        if (!$(this).hasClass('emojiadded')) {
+        //            $("#input_" + ctrId + "").emojioneArea({
+        //                autocomplete: false,
+        //                events: {
+        //                    keyup: function (editor, event) {
+        //                        $("#input_" + ctrId + "").val(editor.html());
+        //                    }
+        //                    ,
+        //                    keypress: function (editor, e) {
+
+
+        //                        if (e.keyCode == 13) {
+        //                            e.preventDefault();
+        //                            var msg = editor.html();
+
+        //                            $(editor).html('');
+        //                            if (msg != null && msg.trim().length > 0) {
+        //                                var userId = $("#input_" + ctrId + "").parents('#messageBoxCntainer .msg_box').attr("data-userid");
+
+        //                                chatHub.server.sendPrivateMessage(userId, msg);
+        //                            }
+        //                        }
+        //                        else {
+        //                            var userId = $("#input_" + ctrId + "").parents('#messageBoxCntainer .msg_box').attr("data-userid");
+        //                            chatHub.server.userTyping(userId, msg);
+        //                        }
+
+        //                    }
+        //                }
+
+        //            });
+        //        }
+        //        else {
+        //            $("#input_" + ctrId + "").emojioneArea({ autocomplete: false });
+        //        }
+        //    });
+        //}
+        function fullChatWindow() {          
+            var userId='@userid';
+            var ctrId = '@ctrid';
+            var userName = '@name';
+            var element = '<div class="msg_box" data-userid="' + userId + '" id="' + ctrId + '" >' +
+                          '<div class="msg_head"><span class="uname">' + userName +
+                          '</span><span style="display:block;" class="utyping"></span>' +
+                          '</div>' +
+                          '<div class="msg_wrap">' +
+                          '<div class="msg_body">' +
+                          //'<div class="msg_a">This is from A</div>'+
+                          //'<div class="msg_b">This is from B, and its amazingly kool nah... i know it even i liked it :)</div>'+
+                          //'<div class="msg_a">Wow, Thats great to hear from you man </div>'+	
+                         '<div class="msg_push"></div>' +
+                         '</div>' +
+                         '<div class="msg_footer"><textarea id="input_' + ctrId + '" class="msg_input" rows="4"></textarea></div>' +
+                         '</div>' +
+                         '</div>';
+            document.getElementById('messageBoxCntainer').innerHTML += element          
+            var $div = $(element);
+            // DELETE BUTTON IMAGE
+            if (userId != '') {
+                getlist(userId);
+            }
+            InitiateEmoji();
+        }
+        $(document).ready(function () {
+            fullChatWindow();
+        });
+    </script>
+    
+</body>
+</html>
